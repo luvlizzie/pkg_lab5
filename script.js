@@ -1,4 +1,3 @@
-// Основные переменные
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 const modeSelect = document.getElementById('mode');
@@ -17,27 +16,22 @@ const drawingStatus = document.getElementById('drawingStatus');
 const liangBarskyInfo = document.getElementById('liangBarskyInfo');
 const sutherlandHodgmanInfo = document.getElementById('sutherlandHodgmanInfo');
 
-// Координаты отсекающего окна
 let xmin = 100, ymin = 100, xmax = 400, ymax = 300;
 
-// Массивы для хранения данных
 let lines = [];
 let polygons = [];
 let clipWindow = { xmin, ymin, xmax, ymax };
 
-// Переменные для рисования
 let currentPolygon = [];
 let isDrawingPolygon = false;
 let isDrawingLine = false;
 let tempLineStart = null;
 let tempLinePoints = [];
 
-// Инициализация
 function init() {
     updateWindowCoordinates();
     drawScene();
     
-    // Обработчики событий
     clipBtn.addEventListener('click', clip);
     clearBtn.addEventListener('click', clearCanvas);
     fileInput.addEventListener('change', handleFileUpload);
@@ -48,7 +42,6 @@ function init() {
     drawLineBtn.addEventListener('click', startDrawingLine);
     drawPolygonBtn.addEventListener('click', startDrawingPolygon);
     
-    // Обработка кликов по canvas
     canvas.addEventListener('click', handleCanvasClick);
     canvas.addEventListener('mousemove', handleCanvasMouseMove);
     
@@ -56,7 +49,6 @@ function init() {
     updateAlgorithmInfo();
 }
 
-// Обновление информации об алгоритмах
 function updateAlgorithmInfo() {
     if (modeSelect.value === 'lines') {
         liangBarskyInfo.style.display = 'block';
@@ -67,7 +59,6 @@ function updateAlgorithmInfo() {
     }
 }
 
-// Обработчик изменения режима
 function handleModeChange() {
     updateAlgorithmInfo();
     
@@ -90,14 +81,12 @@ function handleModeChange() {
     drawScene();
 }
 
-// Обработчик изменения типа многоугольника
 function handlePolygonTypeChange() {
     finishPolygonBtn.style.display = polygonTypeSelect.value === 'custom' ? 'inline-block' : 'none';
     cancelDrawing();
     drawScene();
 }
 
-// Начало рисования отрезка
 function startDrawingLine() {
     if (isDrawingLine) {
         cancelDrawing();
@@ -115,7 +104,6 @@ function startDrawingLine() {
     statusDiv.textContent = 'Режим рисования отрезка: выберите начальную точку';
 }
 
-// Начало рисования многоугольника
 function startDrawingPolygon() {
     if (isDrawingPolygon) {
         cancelDrawing();
@@ -134,7 +122,6 @@ function startDrawingPolygon() {
     statusDiv.textContent = 'Режим рисования многоугольника: добавляйте точки кликом';
 }
 
-// Отмена рисования
 function cancelDrawing() {
     isDrawingLine = false;
     isDrawingPolygon = false;
@@ -147,7 +134,6 @@ function cancelDrawing() {
     drawingStatus.textContent = '';
 }
 
-// Обновление координат окна из полей ввода
 function updateWindowCoordinates() {
     xmin = parseInt(document.getElementById('xmin').value);
     ymin = parseInt(document.getElementById('ymin').value);
@@ -156,14 +142,12 @@ function updateWindowCoordinates() {
     clipWindow = { xmin, ymin, xmax, ymax };
 }
 
-// Обновление окна отсечения
 function updateWindow() {
     updateWindowCoordinates();
     drawScene();
     statusDiv.textContent = 'Окно отсечения обновлено.';
 }
 
-// Обработка движения мыши по canvas
 function handleCanvasMouseMove(event) {
     if (!isDrawingLine && !isDrawingPolygon) return;
     
@@ -172,14 +156,12 @@ function handleCanvasMouseMove(event) {
     const y = event.clientY - rect.top;
     
     if (isDrawingLine && tempLineStart) {
-        // Обновляем временную линию
         tempLinePoints = [tempLineStart, {x, y}];
         drawScene();
         drawTempLine();
     }
 }
 
-// Обработка клика по canvas
 function handleCanvasClick(event) {
     const rect = canvas.getBoundingClientRect();
     const x = event.clientX - rect.left;
@@ -190,25 +172,20 @@ function handleCanvasClick(event) {
     } else if (isDrawingPolygon) {
         handlePolygonDrawing(x, y);
     } else if (modeSelect.value === 'lines') {
-        // Добавление случайного отрезка
         addRandomLine();
     } else {
-        // Автоматическое создание многоугольника
         handleAutoPolygonClick(x, y);
     }
     
     drawScene();
 }
 
-// Обработка рисования отрезка
 function handleLineDrawing(x, y) {
     if (!tempLineStart) {
-        // Первый клик - начало отрезка
         tempLineStart = {x, y};
         drawingStatus.textContent = 'Выберите конечную точку отрезка';
         statusDiv.textContent = `Начальная точка: (${x.toFixed(0)}, ${y.toFixed(0)})`;
     } else {
-        // Второй клик - завершение отрезка
         lines.push({
             x1: tempLineStart.x,
             y1: tempLineStart.y,
@@ -221,14 +198,12 @@ function handleLineDrawing(x, y) {
     }
 }
 
-// Обработка рисования многоугольника
 function handlePolygonDrawing(x, y) {
     currentPolygon.push({x, y});
     drawingStatus.textContent = `Точка ${currentPolygon.length}: (${x.toFixed(0)}, ${y.toFixed(0)})`;
     statusDiv.textContent = `Добавлена точка ${currentPolygon.length}. Кликайте для добавления точек или нажмите "Завершить многоугольник"`;
 }
 
-// Добавление случайного отрезка
 function addRandomLine() {
     const x1 = Math.random() * canvas.width;
     const y1 = Math.random() * canvas.height;
@@ -239,7 +214,6 @@ function addRandomLine() {
     statusDiv.textContent = `Добавлен случайный отрезок: (${x1.toFixed(0)}, ${y1.toFixed(0)}) - (${x2.toFixed(0)}, ${y2.toFixed(0)})`;
 }
 
-// Обработка автоматического создания многоугольника
 function handleAutoPolygonClick(x, y) {
     const type = polygonTypeSelect.value;
     if (type !== 'custom') {
@@ -247,7 +221,6 @@ function handleAutoPolygonClick(x, y) {
     }
 }
 
-// Создание правильного многоугольника
 function createRegularPolygon(centerX, centerY, type) {
     let sides, radius;
     
@@ -285,7 +258,6 @@ function createRegularPolygon(centerX, centerY, type) {
     statusDiv.textContent = `Создан ${getPolygonName(type)} с центром (${centerX.toFixed(0)}, ${centerY.toFixed(0)})`;
 }
 
-// Завершение рисования произвольного многоугольника
 function finishPolygon() {
     if (currentPolygon.length >= 3) {
         polygons.push([...currentPolygon]);
@@ -298,7 +270,6 @@ function finishPolygon() {
     }
 }
 
-// Получение названия многоугольника
 function getPolygonName(type) {
     const names = {
         'triangle': 'треугольник',
@@ -309,7 +280,6 @@ function getPolygonName(type) {
     return names[type] || 'многоугольник';
 }
 
-// Отрисовка всей сцены
 function drawScene() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawCoordinateSystem();
@@ -321,13 +291,10 @@ function drawScene() {
         drawPolygons(polygons, 'blue', false);
     }
     
-    // Рисуем текущий многоугольник в процессе создания
     if (isDrawingPolygon && currentPolygon.length > 0) {
         drawCurrentPolygon();
     }
 }
-
-// Рисование временной линии
 function drawTempLine() {
     if (tempLinePoints.length === 2) {
         ctx.strokeStyle = 'orange';
@@ -341,13 +308,11 @@ function drawTempLine() {
     }
 }
 
-// Рисование текущего многоугольника в процессе создания
 function drawCurrentPolygon() {
     ctx.strokeStyle = 'orange';
     ctx.lineWidth = 2;
     ctx.setLineDash([5, 3]);
     
-    // Рисуем линии между точками
     if (currentPolygon.length > 1) {
         ctx.beginPath();
         ctx.moveTo(currentPolygon[0].x, currentPolygon[0].y);
@@ -357,7 +322,6 @@ function drawCurrentPolygon() {
         ctx.stroke();
     }
     
-    // Рисуем точки
     ctx.fillStyle = 'orange';
     for (const point of currentPolygon) {
         ctx.beginPath();
@@ -367,13 +331,10 @@ function drawCurrentPolygon() {
     
     ctx.setLineDash([]);
 }
-
-// Рисование системы координат
 function drawCoordinateSystem() {
     ctx.strokeStyle = '#ccc';
     ctx.lineWidth = 1;
     
-    // Вертикальные линии
     for (let x = 0; x <= canvas.width; x += 50) {
         ctx.beginPath();
         ctx.moveTo(x, 0);
@@ -387,7 +348,6 @@ function drawCoordinateSystem() {
         }
     }
     
-    // Горизонтальные линии
     for (let y = 0; y <= canvas.height; y += 50) {
         ctx.beginPath();
         ctx.moveTo(0, y);
@@ -402,7 +362,6 @@ function drawCoordinateSystem() {
     }
 }
 
-// Рисование отсекающего окна
 function drawClipWindow() {
     ctx.strokeStyle = 'red';
     ctx.lineWidth = 2;
@@ -416,7 +375,6 @@ function drawClipWindow() {
     ctx.fillText('Окно отсечения', clipWindow.xmin, clipWindow.ymin - 10);
 }
 
-// Рисование отрезков
 function drawLines(linesArray, color, isClipped) {
     ctx.strokeStyle = color;
     ctx.lineWidth = isClipped ? 3 : 2;
@@ -431,7 +389,6 @@ function drawLines(linesArray, color, isClipped) {
     ctx.setLineDash([]);
 }
 
-// Рисование многоугольников
 function drawPolygons(polygonsArray, color, isClipped) {
     ctx.strokeStyle = color;
     ctx.lineWidth = isClipped ? 3 : 2;
@@ -456,7 +413,6 @@ function drawPolygons(polygonsArray, color, isClipped) {
     ctx.setLineDash([]);
 }
 
-// АЛГОРИТМ ЛИАНГА-БАРСКИ ДЛЯ ОТРЕЗКОВ
 function liangBarskyClip(line) {
     const {x1, y1, x2, y2} = line;
     let t0 = 0, t1 = 1;
@@ -493,21 +449,19 @@ function liangBarskyClip(line) {
     return null;
 }
 
-// АЛГОРИТМ ОТСЕЧЕНИЯ ВЫПУКЛОГО МНОГОУГОЛЬНИКА (Сазерленда-Ходжмана)
 function sutherlandHodgmanClip(polygon) {
     if (!polygon || polygon.length < 3) return polygon;
     
     let outputList = polygon;
     
-    outputList = clipAgainstEdge(outputList, 1); // Левая граница
-    outputList = clipAgainstEdge(outputList, 2); // Правая граница
-    outputList = clipAgainstEdge(outputList, 3); // Нижняя граница
-    outputList = clipAgainstEdge(outputList, 4); // Верхняя граница
+    outputList = clipAgainstEdge(outputList, 1); 
+    outputList = clipAgainstEdge(outputList, 2); 
+    outputList = clipAgainstEdge(outputList, 3); 
+    outputList = clipAgainstEdge(outputList, 4); 
     
     return outputList;
 }
 
-// Отсечение относительно одной границы
 function clipAgainstEdge(inputList, edgeType) {
     if (inputList.length === 0) return [];
     
@@ -536,7 +490,6 @@ function clipAgainstEdge(inputList, edgeType) {
     return outputList;
 }
 
-// Проверка нахождения точки внутри относительно границы
 function isInside(point, edgeType) {
     switch (edgeType) {
         case 1: return point.x >= xmin;
@@ -547,24 +500,23 @@ function isInside(point, edgeType) {
     }
 }
 
-// Вычисление точки пересечения отрезка с границей
 function computeIntersection(p1, p2, edgeType) {
     let x, y;
     
     switch (edgeType) {
-        case 1: // Левая граница (x = xmin)
+        case 1: 
             x = xmin;
             y = p1.y + (p2.y - p1.y) * (xmin - p1.x) / (p2.x - p1.x);
             break;
-        case 2: // Правая граница (x = xmax)
+        case 2: 
             x = xmax;
             y = p1.y + (p2.y - p1.y) * (xmax - p1.x) / (p2.x - p1.x);
             break;
-        case 3: // Нижняя граница (y = ymin)
+        case 3: 
             y = ymin;
             x = p1.x + (p2.x - p1.x) * (ymin - p1.y) / (p2.y - p1.y);
             break;
-        case 4: // Верхняя граница (y = ymax)
+        case 4: 
             y = ymax;
             x = p1.x + (p2.x - p1.x) * (ymax - p1.y) / (p2.y - p1.y);
             break;
@@ -574,8 +526,6 @@ function computeIntersection(p1, p2, edgeType) {
     
     return { x, y };
 }
-
-// Основная функция отсечения
 function clip() {
     updateWindowCoordinates();
     
@@ -611,7 +561,6 @@ function clip() {
     }
 }
 
-// Очистка canvas
 function clearCanvas() {
     lines = [];
     polygons = [];
@@ -625,7 +574,6 @@ function clearCanvas() {
     statusDiv.textContent = 'Canvas очищен.';
 }
 
-// Загрузка данных из файла
 function handleFileUpload(event) {
     const file = event.target.files[0];
     if (!file) return;
@@ -637,7 +585,6 @@ function handleFileUpload(event) {
     reader.readAsText(file);
 }
 
-// Парсинг входных данных
 function parseInputData(data) {
     const linesData = data.split('\n').filter(line => line.trim() !== '');
     const n = parseInt(linesData[0]);
@@ -649,9 +596,7 @@ function parseInputData(data) {
     isDrawingLine = false;
     cancelDrawing();
     
-    // Проверяем формат - отрезки или многоугольник
     if (linesData[1].split(' ').length === 4) {
-        // Формат отрезков
         for (let i = 1; i <= n; i++) {
             const coords = linesData[i].split(' ').map(Number);
             if (coords.length >= 4) {
@@ -664,7 +609,6 @@ function parseInputData(data) {
             }
         }
     } else {
-        // Формат многоугольника
         const polygonPoints = [];
         for (let i = 1; i <= n; i++) {
             const coords = linesData[i].split(' ').map(Number);
@@ -677,7 +621,6 @@ function parseInputData(data) {
         }
     }
     
-    // Чтение координат окна (последняя строка)
     const windowCoords = linesData[linesData.length - 1].split(' ').map(Number);
     if (windowCoords.length >= 4) {
         xmin = windowCoords[0];
@@ -697,5 +640,4 @@ function parseInputData(data) {
     statusDiv.textContent = `Загружено ${n} объектов из файла.`;
 }
 
-// Запуск приложения
 init();
