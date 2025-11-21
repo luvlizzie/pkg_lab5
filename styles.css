@@ -156,7 +156,6 @@ button:disabled {
     transform: none;
 }
 
-/* Поля ввода */
 .styled-select {
     padding: 10px 15px;
     border: 2px solid #e9ecef;
@@ -205,7 +204,6 @@ button:disabled {
     min-width: auto;
 }
 
-/* Файловый ввод */
 .file-input {
     padding: 10px;
     border: 2px dashed #bdc3c7;
@@ -225,7 +223,6 @@ button:disabled {
     font-style: italic;
 }
 
-/* Статус панель */
 .status-panel {
     display: flex;
     align-items: center;
@@ -251,7 +248,6 @@ button:disabled {
     font-style: italic;
 }
 
-/* Контейнер canvas */
 .canvas-container {
     background: white;
     padding: 20px;
@@ -269,8 +265,6 @@ canvas {
     cursor: crosshair;
     border-radius: 8px;
 }
-
-/* Описание алгоритмов */
 .algorithm-info {
     margin-top: 30px;
 }
@@ -337,7 +331,6 @@ canvas {
     line-height: 1.5;
 }
 
-/* Адаптивность */
 @media (max-width: 768px) {
     .container {
         padding: 15px;
