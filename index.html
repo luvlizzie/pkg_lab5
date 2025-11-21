@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Визуализация алгоритмов отсечения</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>Визуализация алгоритмов отсечения</h1>
+            <p class="subtitle">Интерактивная демонстрация алгоритмов компьютерной графики</p>
+        </header>
+        
+        <div class="controls-panel">
+            <div class="control-section">
+                <h3>⚙️ Основные настройки</h3>
+                <div class="control-group">
+                    <label for="mode">Режим работы:</label>
+                    <select id="mode" class="styled-select">
+                        <option value="lines">Отсечение отрезков (Лианга-Барски)</option>
+                        <option value="polygon">Отсечение выпуклого многоугольника</option>
+                    </select>
+                    
+                    <button id="clipBtn" class="btn-primary">🎨 Выполнить отсечение</button>
+                    <button id="clearBtn" class="btn-secondary">🗑️ Очистить сцену</button>
+                </div>
+            </div>
+            
+            <div class="control-section" id="drawingControls">
+                <h3>✏️ Инструменты рисования</h3>
+                <div class="control-group">
+                    <button id="drawLineBtn" class="btn-drawing">📏 Нарисовать отрезок</button>
+                    <button id="drawPolygonBtn" class="btn-drawing" style="display: none;">🔺 Нарисовать многоугольник</button>
+                    <span id="drawingStatus" class="drawing-status"></span>
+                </div>
+            </div>
+            
+            <div class="control-section" id="polygonControls" style="display: none;">
+                <h3>Настройки многоугольника</h3>
+                <div class="control-group">
+                    <label for="polygonType">Тип фигуры:</label>
+                    <select id="polygonType" class="styled-select">
+                        <option value="triangle">Треугольник</option>
+                        <option value="rectangle">Прямоугольник</option>
+                        <option value="pentagon">Пятиугольник</option>
+                        <option value="hexagon">Шестиугольник</option>
+                        <option value="custom">Произвольный</option>
+                    </select>
+                    <button id="finishPolygonBtn" class="btn-success" style="display: none;">✅ Завершить многоугольник</button>
+                </div>
+            </div>
+            
+            <div class="control-section">
+                <h3>Окно отсечения</h3>
+                <div class="control-group window-controls">
+                    <div class="window-input-group">
+                        <label>Xmin:</label>
+                        <input type="number" id="xmin" value="100" class="coord-input">
+                    </div>
+                    <div class="window-input-group">
+                        <label>Ymin:</label>
+                        <input type="number" id="ymin" value="100" class="coord-input">
+                    </div>
+                    <div class="window-input-group">
+                        <label>Xmax:</label>
+                        <input type="number" id="xmax" value="400" class="coord-input">
+                    </div>
+                    <div class="window-input-group">
+                        <label>Ymax:</label>
+                        <input type="number" id="ymax" value="300" class="coord-input">
+                    </div>
+                    <button id="updateWindowBtn" class="btn-warning">🔄 Обновить окно</button>
+                </div>
+            </div>
+            
+            <div class="control-section">
+                <h3>📁 Загрузка данных</h3>
+                <div class="control-group">
+                    <input type="file" id="fileInput" class="file-input" accept=".txt">
+                    <div class="file-hint">Поддерживаются файлы .txt с координатами</div>
+                </div>
+            </div>
+            
+            <div class="status-panel" id="status">
+                <div class="status-icon">💡</div>
+                <div class="status-text">Готов к работе. Выберите режим и начните рисование.</div>
+            </div>
+        </div>
+        
+        <div class="canvas-container">
+            <canvas id="canvas" width="800" height="600"></canvas>
+        </div>
+
+        <!-- Описание алгоритмов -->
+        <div class="algorithm-info">
+            <div id="liangBarskyInfo" class="algorithm-description">
+                <div class="algorithm-header">
+                    <h3>📐 Алгоритм Лианга-Барски</h3>
+                    <span class="algorithm-badge">Отсечение отрезков</span>
+                </div>
+                <div class="algorithm-content">
+                    <div class="algorithm-point">
+                        <strong>Принцип работы:</strong> Использует параметрическое представление отрезков для эффективного отсечения.
+                    </div>
+                    <div class="algorithm-point">
+                        <strong>Как работает:</strong>
+                        <ul>
+                            <li>Отрезок представляется в параметрической форме: x = x1 + t⋅dx, y = y1 + t⋅dy</li>
+                            <li>Для каждой границы окна вычисляются параметры входа (t0) и выхода (t1)</li>
+                            <li>Отсечение происходит путем нахождения пересечения параметрического отрезка с границами окна</li>
+                            <li>Алгоритм особенно эффективен когда большинство отрезков полностью видимы или невидимы</li>
+                        </ul>
+                    </div>
+                    <div class="algorithm-point">
+                        <strong>✅ Преимущества:</strong> Быстрее алгоритма Сазерленда-Коэна, требует меньше вычислений
+                    </div>
+                </div>
+            </div>
+            
+            <div id="sutherlandHodgmanInfo" class="algorithm-description" style="display: none;">
+                <div class="algorithm-header">
+                    <h3>🔷 Алгоритм Сазерленда-Ходжмана</h3>
+                    <span class="algorithm-badge">Отсечение многоугольников</span>
+                </div>
+                <div class="algorithm-content">
+                    <div class="algorithm-point">
+                        <strong>Принцип работы:</strong> Последовательно отсекает многоугольник каждой границей окна.
+                    </div>
+                    <div class="algorithm-point">
+                        <strong>Как работает:</strong>
+                        <ul>
+                            <li>Многоугольник отсекается поочередно левой, правой, нижней и верхней границами</li>
+                            <li>Для каждой границы проверяются все ребра многоугольника</li>
+                            <li>Создается новый многоугольник из точек, оставшихся внутри после отсечения</li>
+                            <li>Процесс повторяется для всех четырех границ</li>
+                        </ul>
+                    </div>
+                    <div class="algorithm-point">
+                        <strong>📝 Особенности:</strong> Работает только с выпуклыми окнами отсечения, сохраняет структуру многоугольника
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
